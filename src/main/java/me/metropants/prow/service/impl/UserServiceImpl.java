@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.metropants.prow.entity.entities.User;
 import me.metropants.prow.payload.request.RegisterRequest;
+import me.metropants.prow.payload.request.UserUpdateRequest;
 import me.metropants.prow.repository.UserRepository;
 import me.metropants.prow.service.UserService;
 import org.jetbrains.annotations.NotNull;
@@ -48,6 +49,41 @@ public class UserServiceImpl implements UserService {
         log.info("Saving user: {}", user);
         user.setPassword(this.encoder.encode(user.getPassword()));
         return this.repository.save(user);
+    }
+
+    @Override
+    public User update(@NotNull String username, @NotNull UserUpdateRequest request) {
+        return this.repository.findUserByUsername(username)
+                .map(user -> {
+                    if (!user.getRoles().contains(User.Role.ADMIN) && request.roles() != null) {
+                        throw new IllegalArgumentException("You do not have permission to update roles.");
+                    }
+
+                    User updated = MAPPER.map(request);
+                    if (updated == null) {
+                        log.error("Failed to map request to user. \nRequest: {}", request);
+                        return null;
+                    }
+
+                    updated.setId(user.getId());
+                    if (updated.getUsername() == null) {
+                        updated.setUsername(user.getUsername());
+                    } else {
+                        checkUsername(updated.getUsername());
+                    }
+
+                    if (request.password() == null) {
+                        updated.setPassword(user.getPassword());
+                    } else {
+                        updated.setPassword(this.encoder.encode(request.password()));
+                    }
+
+                    if (updated.getRoles() == null) {
+                        updated.setRoles(user.getRoles());
+                    }
+                    return this.repository.save(updated);
+                })
+                .orElseThrow(() -> new UsernameNotFoundException("User with username " + username + " not found."));
     }
 
     @Override

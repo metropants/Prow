@@ -2,6 +2,7 @@ package me.metropants.prow.service;
 
 import me.metropants.prow.entity.entities.User;
 import me.metropants.prow.payload.request.RegisterRequest;
+import me.metropants.prow.payload.request.UserUpdateRequest;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,6 +21,9 @@ public interface UserService extends UserDetailsService {
         @Mapping(target = "id", ignore = true)
         User map(RegisterRequest request);
 
+        @Mapping(target = "id", ignore = true)
+        User map(UserUpdateRequest request);
+
     }
 
     UserMapper MAPPER = UserMapper.INSTANCE;
@@ -29,6 +33,8 @@ public interface UserService extends UserDetailsService {
      * @return the newly created {@link User} instance.
      */
     User save(@NotNull RegisterRequest request);
+
+    User update(@NotNull String username, @NotNull UserUpdateRequest request);
 
     void deleteById(long id);
 
