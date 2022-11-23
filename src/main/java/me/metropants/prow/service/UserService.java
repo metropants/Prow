@@ -36,11 +36,9 @@ public interface UserService extends UserDetailsService {
 
     User update(@NotNull String username, @NotNull UserUpdateRequest request);
 
-    void deleteById(long id);
-
     void deleteByUsername(@NotNull String username);
 
-    User getById(long id);
+    boolean existsByUsername(@NotNull String username);
 
     User getByUsername(@NotNull String username);
 

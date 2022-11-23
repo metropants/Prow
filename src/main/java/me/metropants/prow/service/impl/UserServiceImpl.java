@@ -87,11 +87,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteById(long id) {
-        this.repository.deleteById(id);
-    }
-
-    @Override
     public void deleteByUsername(@NotNull String username) {
         if (!this.repository.existsByUsername(username)) {
             throw new UsernameNotFoundException("User with username " + username + " does not exist.");
@@ -101,9 +96,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getById(long id) {
-        return this.repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User with id " + id + " does not exist."));
+    public boolean existsByUsername(@NotNull String username) {
+        return this.repository.existsByUsername(username);
     }
 
     @Override
